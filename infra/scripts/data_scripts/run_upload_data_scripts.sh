@@ -4,6 +4,10 @@ echo "Starting the data upload script"
 python -m venv .venv
 
 .venv\Scripts\activate
+python pip install -r infra/scripts/data_scripts/requirements.txt --quiet
+python infra/scripts/data_scripts/01_create_products_search_index.py
+python infra/scripts/data_scripts/02_create_policies_search_index.py
+python infra/scripts/data_scripts/03_write_products_to_cosmos.py
 
 # # Variables
 # fabricWorkspaceId="$1"
