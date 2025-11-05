@@ -10,7 +10,7 @@ param appSettings object = {}
 param appServicePlanId string
 
 // var imageName = 'DOCKER|${acrName}.azurecr.io/ccb-app:${imageTag}'
-var imageName = 'DOCKER|${acrName}.azurecr.io/ccb-app1:${imageTag}'
+var imageName = 'DOCKER|${acrName}.azurecr.io/frontend:${imageTag}'
 //var name = '${solutionName}-app'
 param name string
 module appService 'deploy_app_service.bicep' = {
