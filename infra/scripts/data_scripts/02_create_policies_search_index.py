@@ -22,13 +22,25 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+import argparse
+p = argparse.ArgumentParser()
+p.add_argument("--ai_search_endpoint", required=True)
+p.add_argument("--azure_openai_endpoint", required=True)
+p.add_argument("--embedding_model_name", required=True)
+args = p.parse_args()
+
+
 INDEX_NAME = "policies_index"
 
 # Delete the search index
 
-search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
-openai_resource_url = os.getenv("AZURE_OPENAI_ENDPOINT")    
-embedding_model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
+# search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
+# openai_resource_url = os.getenv("AZURE_OPENAI_ENDPOINT")    
+# embedding_model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
+
+search_endpoint = args.ai_search_endpoint
+openai_resource_url = args.azure_openai_endpoint
+embedding_model = args.embedding_model_name
 
 credential = get_azure_credential()
 # Shared credential
@@ -124,9 +136,12 @@ import pandas as pd
 import re
 
 openai_api_version = '2025-01-01-preview'
-openai_api_base = os.getenv("AZURE_OPENAI_ENDPOINT") 
+# openai_api_base = os.getenv("AZURE_OPENAI_ENDPOINT") 
 
-search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
+# search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
+openai_api_base = args.azure_openai_endpoint
+search_endpoint = args.ai_search_endpoint
+
 credential = get_azure_credential()
 search_client = SearchClient(endpoint=search_endpoint, index_name=INDEX_NAME, credential=credential)
 

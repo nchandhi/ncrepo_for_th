@@ -1,13 +1,182 @@
 #!/bin/bash
 echo "Starting the data upload script"
 
-python -m venv .venv
+# Variables
+fabricWorkspaceId="$1"
+solutionName="$2"
+aiFoundryName="$3"
+backend_app_pid="$4"
+backend_app_uid="$5"
+app_service="$6"
+resource_group="$7"
+ai_search_endpoint="$8"
+azure_openai_endpoint="$9"
+embedding_model_name="${10}"
+aiFoundryResourceId="${11}"
+aiSearchResourceId="${12}"
+cosmosdb_account="${13}"
 
-.venv\Scripts\activate
-python pip install -r infra/scripts/data_scripts/requirements.txt --quiet
-python infra/scripts/data_scripts/01_create_products_search_index.py
-python infra/scripts/data_scripts/02_create_policies_search_index.py
-python infra/scripts/data_scripts/03_write_products_to_cosmos.py
+
+
+# get parameters from azd env, if not provided
+if [ -z "$solutionName" ]; then
+    solutionName=$(azd env get-value SOLUTION_NAME)
+fi
+
+if [ -z "$aiFoundryName" ]; then
+    aiFoundryName=$(azd env get-value AI_SERVICE_NAME)
+fi
+
+if [ -z "$backend_app_pid" ]; then
+    backend_app_pid=$(azd env get-value API_PID)
+fi
+
+if [ -z "$backend_app_uid" ]; then
+    backend_app_uid=$(azd env get-value API_UID)
+fi
+
+if [ -z "$app_service" ]; then
+    app_service=$(azd env get-value API_APP_NAME)
+fi
+
+if [ -z "$resource_group" ]; then
+    resource_group=$(azd env get-value RESOURCE_GROUP_NAME)
+fi
+
+if [ -z "$ai_search_endpoint" ]; then
+    ai_search_endpoint=$(azd env get-value AZURE_AI_SEARCH_ENDPOINT)
+fi
+if [ -z "$azure_openai_endpoint" ]; then
+    azure_openai_endpoint=$(azd env get-value AZURE_OPENAI_ENDPOINT)
+fi
+
+if [ -z "$embedding_model_name" ]; then
+    embedding_model_name=$(azd env get-value AZURE_OPENAI_EMBEDDING_MODEL)
+fi
+
+if [ -z "$aiFoundryResourceId" ]; then
+    aiFoundryResourceId=$(azd env get-value AI_FOUNDRY_RESOURCE_ID)
+fi
+
+if [ -z "$aiSearchResourceId" ]; then
+    aiSearchResourceId=$(azd env get-value AI_SEARCH_SERVICE_RESOURCE_ID)
+fi
+
+if [ -z "$cosmosdb_account" ]; then
+    cosmosdb_account=$(azd env get-value AZURE_COSMOSDB_ACCOUNT)
+fi
+
+# cosmosdb_endpoint="https://${cosmosdb_account}.documents.azure.com:443/"
+
+# Check if user is logged in to Azure
+echo "Checking Azure authentication..."
+if az account show &> /dev/null; then
+    echo "Already authenticated with Azure."
+else
+    # Use Azure CLI login if running locally
+    echo "Authenticating with Azure CLI..."
+    az login
+fi
+
+echo "Getting signed in user id"
+signed_user_id=$(az ad signed-in-user show --query id -o tsv)
+
+echo "Checking if the user has Search roles on the AI Search Service"
+# search service contributor role id: 7ca78c08-252a-4471-8644-bb5ff32d4ba0
+# search index data contributor role id: 8ebe5a00-799e-43f5-93ac-243d3dce84a7
+# search index data reader role id: 1407120a-92aa-4202-b7e9-c0e197c71c8f
+
+role_assignment=$(MSYS_NO_PATHCONV=1 az role assignment list \
+  --role "7ca78c08-252a-4471-8644-bb5ff32d4ba0" \
+  --scope "$aiSearchResourceId" \
+  --assignee "$signed_user_id" \
+  --query "[].roleDefinitionId" -o tsv)
+
+if [ -z "$role_assignment" ]; then
+    echo "User does not have the search service contributor role. Assigning the role..."
+    MSYS_NO_PATHCONV=1 az role assignment create \
+      --assignee "$signed_user_id" \
+      --role "7ca78c08-252a-4471-8644-bb5ff32d4ba0" \
+      --scope "$aiSearchResourceId" \
+      --output none
+
+    if [ $? -eq 0 ]; then
+        echo "Search service contributor role assigned successfully."
+    else
+        echo "Failed to assign search service contributor role."
+        exit 1
+    fi
+else
+    echo "User already has the search service contributor role."
+fi
+
+role_assignment=$(MSYS_NO_PATHCONV=1 az role assignment list \
+  --role "8ebe5a00-799e-43f5-93ac-243d3dce84a7" \
+  --scope "$aiSearchResourceId" \
+  --assignee "$signed_user_id" \
+  --query "[].roleDefinitionId" -o tsv)
+
+if [ -z "$role_assignment" ]; then
+    echo "User does not have the search index data contributor role. Assigning the role..."
+    MSYS_NO_PATHCONV=1 az role assignment create \
+      --assignee "$signed_user_id" \
+      --role "8ebe5a00-799e-43f5-93ac-243d3dce84a7" \
+      --scope "$aiSearchResourceId" \
+      --output none
+
+    if [ $? -eq 0 ]; then
+        echo "Search index data contributor role assigned successfully."
+    else
+        echo "Failed to assign search index data contributor role."
+        exit 1
+    fi
+else
+    echo "User already has the search index data contributor role."
+fi
+
+role_assignment=$(MSYS_NO_PATHCONV=1 az role assignment list \
+  --role "1407120a-92aa-4202-b7e9-c0e197c71c8f" \
+  --scope "$aiSearchResourceId" \
+  --assignee "$signed_user_id" \
+  --query "[].roleDefinitionId" -o tsv)
+
+if [ -z "$role_assignment" ]; then
+    echo "User does not have the search index data reader role. Assigning the role..."
+    MSYS_NO_PATHCONV=1 az role assignment create \
+      --assignee "$signed_user_id" \
+      --role "1407120a-92aa-4202-b7e9-c0e197c71c8f" \
+      --scope "$aiSearchResourceId" \
+      --output none
+
+    if [ $? -eq 0 ]; then
+        echo "Search index data reader role assigned successfully."
+    else
+        echo "Failed to assign search index data reader role."
+        exit 1
+    fi
+else
+    echo "User already has the search index data reader role."
+fi
+
+
+# python -m venv .venv
+
+# .venv\Scripts\activate
+
+requirementFile="infra/scripts/data_scripts/requirements.txt"
+
+# Download and install Python requirements
+python -m pip install --upgrade pip
+python -m pip install --quiet -r "$requirementFile"
+
+
+
+# python pip install -r infra/scripts/data_scripts/requirements.txt --quiet
+python infra/scripts/data_scripts/01_create_products_search_index.py --ai_search_endpoint="$ai_search_endpoint" --azure_openai_endpoint="$azure_openai_endpoint" --embedding_model_name="$embedding_model_name"
+python infra/scripts/data_scripts/02_create_policies_search_index.py --ai_search_endpoint="$ai_search_endpoint" --azure_openai_endpoint="$azure_openai_endpoint" --embedding_model_name="$embedding_model_name"
+python infra/scripts/data_scripts/03_write_products_to_cosmos.py --cosmosdb_account="$cosmosdb_account"
+# python infra/scripts/data_scripts/02_create_policies_search_index.py
+# python infra/scripts/data_scripts/03_write_products_to_cosmos.py
 
 # # Variables
 # fabricWorkspaceId="$1"

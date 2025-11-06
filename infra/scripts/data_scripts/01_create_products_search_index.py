@@ -18,30 +18,13 @@ from azure_credential_utils import get_azure_credential
 
 import sys
 
-# KEY_VAULT_NAME=sys.argv[1]
-# MANAGED_IDENTITY_CLIENT_ID=sys.argv[2]
-# INDEX_NAME = "call_transcripts_index"
+import argparse
+p = argparse.ArgumentParser()
+p.add_argument("--ai_search_endpoint", required=True)
+p.add_argument("--azure_openai_endpoint", required=True)
+p.add_argument("--embedding_model_name", required=True)
+args = p.parse_args()
 
-# print("calling create_search_index()....")
-
-
-# def get_secrets_from_kv(secret_name: str) -> str:
-#     """
-#     Retrieves a secret value from Azure Key Vault.
-
-#     Args:
-#         secret_name (str): Name of the secret.
-#         credential (ManagedIdentityCredential): Credential with access to Key Vault.
-
-#     Returns:
-#         str: The secret value.
-#     """
-#     kv_credential = get_azure_credential(client_id=MANAGED_IDENTITY_CLIENT_ID)
-#     secret_client = SecretClient(
-#         vault_url=f"https://{KEY_VAULT_NAME}.vault.azure.net/",
-#         credential=kv_credential
-#     )
-#     return secret_client.get_secret(secret_name).value
 
 import os
 from dotenv import load_dotenv
@@ -52,9 +35,15 @@ INDEX_NAME = "products_index"
 
 # Delete the search index
 
-search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
-openai_resource_url = os.getenv("AZURE_OPENAI_ENDPOINT")    
-embedding_model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
+# search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
+# openai_resource_url = os.getenv("AZURE_OPENAI_ENDPOINT")    
+# embedding_model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
+
+
+search_endpoint = args.ai_search_endpoint
+print("Search Endpoint:", search_endpoint)
+openai_resource_url = args.azure_openai_endpoint
+embedding_model = args.embedding_model_name
 
 credential = get_azure_credential()
 # Shared credential
@@ -150,9 +139,12 @@ import pandas as pd
 import re
 
 openai_api_version = '2025-01-01-preview'
-openai_api_base = os.getenv("AZURE_OPENAI_ENDPOINT") 
+# openai_api_base = os.getenv("AZURE_OPENAI_ENDPOINT") 
 
-search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
+# search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
+openai_api_base = args.azure_openai_endpoint
+search_endpoint = args.ai_search_endpoint
+
 credential = get_azure_credential()
 search_client = SearchClient(endpoint=search_endpoint, index_name=INDEX_NAME, credential=credential)
 
@@ -230,7 +222,6 @@ for _, row in df_products.iterrows():
         result = search_client.upload_documents(documents=docs)
         docs = []
         print(f'{counter} uploaded to Azure Search.')
-    break
 
 if docs != []:
     result = search_client.upload_documents(documents=docs)

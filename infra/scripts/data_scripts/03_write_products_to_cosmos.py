@@ -11,7 +11,14 @@ from azure.cosmos import CosmosClient, PartitionKey, exceptions
 
 load_dotenv()
 
-ENDPOINT = f"https://{os.getenv('AZURE_COSMOSDB_ACCOUNT')}.documents.azure.com:443/"
+import argparse
+p = argparse.ArgumentParser()
+p.add_argument("--cosmosdb_account", required=True)
+args = p.parse_args()
+
+#ENDPOINT = f"https://{os.getenv('AZURE_COSMOSDB_ACCOUNT')}.documents.azure.com:443/"
+
+ENDPOINT = f"https://{args.cosmosdb_account}.documents.azure.com:443/"
 print(f"Cosmos DB Endpoint: {ENDPOINT}")
 DB_NAME = os.getenv("AZURE_COSMOSDB_DATABASE", "db_conversation_history")
 CONTAINER_NAME = "products"
@@ -44,8 +51,8 @@ def get_or_create_container(database, container_name: str, partition_key_path: s
     try:
         container = database.create_container_if_not_exists(
             id=container_name,
-            partition_key=PartitionKey(path=partition_key_path),
-            offer_throughput=400
+            partition_key=PartitionKey(path=partition_key_path)
+            # offer_throughput=400
         )
         print(f"Container '{container_name}' ready with partition key '{partition_key_path}'.")
         return container

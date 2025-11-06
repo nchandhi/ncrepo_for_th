@@ -294,9 +294,13 @@ output AZURE_COSMOSDB_CONVERSATIONS_CONTAINER string = 'conversations'
 output AZURE_COSMOSDB_DATABASE string = 'db_conversation_history'
 output AZURE_COSMOSDB_ENABLE_FEEDBACK string = 'True'
 output AZURE_OPENAI_DEPLOYMENT_MODEL string = gptModelName
-output AZURE_OPENAI_DEPLOYMENT_MODEL_CAPACITY int = gptDeploymentCapacity
+output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModel
+output AZURE_OPENAI_EMBEDDING_MODEL_CAPACITY int = embeddingDeploymentCapacity
 output AZURE_OPENAI_ENDPOINT string = aifoundry.outputs.aiServicesTarget
 output AZURE_OPENAI_MODEL_DEPLOYMENT_TYPE string = deploymentType
+
+output AZURE_AI_SEARCH_ENDPOINT string = aifoundry.outputs.aiSearchTarget
+
 // output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModel
 // output AZURE_OPENAI_EMBEDDING_MODEL_CAPACITY int = embeddingDeploymentCapacity
 output AZURE_OPENAI_API_VERSION string = azureOpenAIApiVersion
@@ -328,3 +332,4 @@ output FABRIC_SQL_CONNECTION_STRING string = ''
 
 output MANAGED_IDENTITY_CLIENT_ID string = managedIdentityModule.outputs.managedIdentityOutput.clientId
 output AI_FOUNDRY_RESOURCE_ID string = aifoundry.outputs.aiFoundryResourceId
+output AI_SEARCH_SERVICE_RESOURCE_ID string = aifoundry.outputs.searchServiceResourceId
