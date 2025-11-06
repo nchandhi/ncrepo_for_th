@@ -237,9 +237,7 @@ module backend_docker 'deploy_backend_docker.bicep' = {
       AZURE_COSMOSDB_CONVERSATIONS_CONTAINER: cosmosDBModule.outputs.cosmosContainerName
       AZURE_COSMOSDB_DATABASE: cosmosDBModule.outputs.cosmosDatabaseName
       AZURE_COSMOSDB_ENABLE_FEEDBACK: '' //'True'
-      // SQLDB_DATABASE: '' //sqlDBModule.outputs.sqlDbName
-      // SQLDB_SERVER: '' //sqlDBModule.outputs.sqlServerName
-      // SQLDB_USER_MID: '' //managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
+    
       API_UID: managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
       AZURE_AI_SEARCH_ENDPOINT: aifoundry.outputs.aiSearchTarget
       AZURE_AI_SEARCH_INDEX: 'call_transcripts_index'
@@ -252,11 +250,21 @@ module backend_docker 'deploy_backend_docker.bicep' = {
       SOLUTION_NAME: solutionPrefix
       APP_ENV: 'Prod'
 
-      AGENT_ID_CHAT: ''
-
-      FABRIC_SQL_DATABASE: ''
-      FABRIC_SQL_SERVER: ''
-      FABRIC_SQL_CONNECTION_STRING: ''
+      ALLOWED_ORIGINS_STR: ''
+      AZURE_FOUNDRY_ENDPOINT: ''
+      AZURE_OPENAI_API_KEY: ''
+      AZURE_SEARCH_API_KEY: ''
+      AZURE_SEARCH_ENDPOINT: aifoundry.outputs.aiSearchTarget
+      AZURE_SEARCH_INDEX: 'policies_index'
+      AZURE_SEARCH_PRODUCT_INDEX: 'products_index'
+      COSMOS_DB_DATABASE_NAME: cosmosDBModule.outputs.cosmosDatabaseName
+      COSMOS_DB_ENDPOINT: '${cosmosDBModule.outputs.cosmosDatabaseName}.documents.azure.com:443/'
+      COSMOS_DB_KEY: '' 
+      FOUNDRY_KNOWLEDGE_AGENT_ID: ''
+      FOUNDRY_ORCHESTRATOR_AGENT_ID: ''
+      FOUNDRY_ORDER_AGENT_ID: ''
+      FOUNDRY_PRODUCT_AGENT_ID: ''
+      USE_FOUNDRY_AGENTS: 'True'
     }
   }
   scope: resourceGroup(resourceGroup().name)
@@ -272,8 +280,8 @@ module frontend_docker 'deploy_frontend_docker.bicep' = {
     appServicePlanId: hostingplan.outputs.name
     applicationInsightsId: aifoundry.outputs.applicationInsightsId
     appSettings:{
-      APP_API_BASE_URL:backend_docker.outputs.appUrl
-      CHAT_LANDING_TEXT:'You can ask questions around sales, products and orders.'
+      NODE_ENV:'production'
+      VITE_API_BASE_URL:backend_docker.outputs.appUrl
     }
   }
   scope: resourceGroup(resourceGroup().name)
