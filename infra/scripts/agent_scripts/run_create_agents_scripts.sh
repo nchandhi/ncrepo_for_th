@@ -48,7 +48,7 @@ if az account show &> /dev/null; then
     echo "Already authenticated with Azure."
 else
     # Use Azure CLI login if running locally
-    echo "Authenticating with Azure CLI..."
+    # echo "Authenticating with Azure CLI..."
     az login
 fi
 
@@ -71,9 +71,9 @@ if [ -z "$role_assignment" ]; then
       --output none
 
     if [ $? -eq 0 ]; then
-        echo "✅ Azure AI User role assigned successfully."
+        echo "Azure AI User role assigned successfully."
     else
-        echo "❌ Failed to assign Azure AI User role."
+        echo "Failed to assign Azure AI User role."
         exit 1
     fi
 else
@@ -101,3 +101,5 @@ az webapp config appsettings set \
   -o none
 
 echo "Environment variables updated for App Service: $apiAppName"
+
+
