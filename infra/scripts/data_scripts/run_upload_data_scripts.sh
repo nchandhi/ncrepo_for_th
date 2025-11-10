@@ -15,6 +15,7 @@ embedding_model_name="${9}"
 aiFoundryResourceId="${10}"
 aiSearchResourceId="${11}"
 cosmosdb_account="${12}"
+cosmosdbAccountId="${13}"
 
 
 # get parameters from azd env, if not provided
@@ -65,6 +66,9 @@ if [ -z "$cosmosdb_account" ]; then
     cosmosdb_account=$(azd env get-value AZURE_COSMOSDB_ACCOUNT)
 fi
 
+if [ -z "$cosmosdbAccountId" ]; then
+    cosmosdbAccountId=$(azd env get-value COSMOSDB_ACCOUNT_ID)
+fi
 
 # Check if user is logged in to Azure
 echo "Checking Azure authentication..."
@@ -156,6 +160,30 @@ else
     echo "User already has the search index data reader role."
 fi
 
+
+role_assignment=$(MSYS_NO_PATHCONV=1 az role assignment list \
+  --role "00000000-0000-0000-0000-000000000002" \
+  --scope "$cosmosdbAccountId" \
+  --assignee "$signed_user_id" \
+  --query "[].roleDefinitionId" -o tsv)
+
+if [ -z "$role_assignment" ]; then
+    echo "User does not have the Cosmos DB account contributor role. Assigning the role..."
+    MSYS_NO_PATHCONV=1 az role assignment create \
+      --assignee "$signed_user_id" \
+      --role "00000000-0000-0000-0000-000000000002" \
+      --scope "$cosmosdbAccountId" \
+      --output none
+
+    if [ $? -eq 0 ]; then
+        echo "Cosmos DB account contributor role assigned successfully."
+    else
+        echo "Failed to assign Cosmos DB account contributor role."
+        exit 1
+    fi
+else
+    echo "User already has the Cosmos DB account contributor role."
+fi
 
 # python -m venv .venv
 

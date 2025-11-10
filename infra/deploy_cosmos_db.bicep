@@ -131,3 +131,4 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15
 output cosmosAccountName string = cosmos.name
 output cosmosDatabaseName string = databaseName
 output cosmosContainerName string = collectionName
+output cosmosAccountId string = cosmos.id

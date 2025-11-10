@@ -315,3 +315,4 @@ output AGENT_ID_CHAT string = ''
 output MANAGED_IDENTITY_CLIENT_ID string = managedIdentityModule.outputs.managedIdentityOutput.clientId
 output AI_FOUNDRY_RESOURCE_ID string = aifoundry.outputs.aiFoundryResourceId
 output AI_SEARCH_SERVICE_RESOURCE_ID string = aifoundry.outputs.searchServiceResourceId
+output COSMOSDB_ACCOUNT_ID string = cosmosDBModule.outputs.cosmosAccountId
