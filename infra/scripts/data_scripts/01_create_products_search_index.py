@@ -213,9 +213,9 @@ df_products = pd.read_csv('infra/data/products/products.csv')
 docs = []
 counter = 0
 for _, row in df_products.iterrows():
-    print('Uploading productId:', row['ProductID'])
-    content = f'ProductID: {row["ProductID"]}. ProductName: {row["ProductName"]}. ProductCategory: {row["ProductCategory"]}. Price: {row["Price"]}. ProductDescription: {row["ProductDescription"]}. ProductPunchLine: {row["ProductPunchLine"]}. ImageURL: {row["ImageURL"]}.'
-    docs.extend(prepare_search_doc(content, row['ProductID'], row['ImageURL']))
+    print('Uploading productId:', row['productId'])
+    content = f'productId: {row["productId"]}. ProductName: {row["title"]}. ProductCategory: {row["category"]}. Price: {row["price"]}. ProductDescription: {row["description"]}. ProductPunchLine: {row["punchLine"]}. ImageURL: {row["image"]}.'
+    docs.extend(prepare_search_doc(content, row['productId'], row['image']))
     # print(docs)
     counter += 1
     if docs != [] and counter % 20 == 0:

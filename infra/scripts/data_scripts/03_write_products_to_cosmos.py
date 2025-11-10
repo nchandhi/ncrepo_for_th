@@ -20,10 +20,10 @@ args = p.parse_args()
 
 ENDPOINT = f"https://{args.cosmosdb_account}.documents.azure.com:443/"
 print(f"Cosmos DB Endpoint: {ENDPOINT}")
-DB_NAME = os.getenv("AZURE_COSMOSDB_DATABASE", "db_conversation_history")
+DB_NAME = os.getenv("AZURE_COSMOSDB_DATABASE", "ecommerce_db")
 CONTAINER_NAME = "products"
 CSV_PATH = "infra/data/products/products.csv"
-PARTITION_KEY_PATH = "/ProductID"
+PARTITION_KEY_PATH = "/productId"
 
 if not ENDPOINT:
     sys.exit("Missing COSMOS_ENDPOINT in environment variables.")
@@ -68,9 +68,9 @@ def normalize_row(row: Dict[str, Any]) -> Dict[str, Any]:
 
     # Ensure 'id' exists (Cosmos DB requirement)
     if not item.get("id"):
-        item["id"] = item.get("ProductID") or item.get("ProductName")
+        item["id"] = item.get("productId") or item.get("productId")
     if not item["id"]:
-        raise ValueError("Each item must have a unique 'id' or 'ProductID'.")
+        raise ValueError("Each item must have a unique 'id' or 'productId'.")
 
     # Cast Price to float
     if "Price" in item and item["Price"] != "":

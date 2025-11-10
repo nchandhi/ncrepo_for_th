@@ -2,14 +2,34 @@ param solutionLocation string
 // param keyVaultName string
 param accountName string 
 // var accountName = '${ solutionName }-cosmos'
-var databaseName = 'db_conversation_history'
-var collectionName = 'conversations'
+var databaseName = 'ecommerce_db'
+var collectionName = 'chat_sessions'
 
 var containers = [
   {
-    name: collectionName
-    id: collectionName
-    partitionKey: '/userId'
+    name: 'carts'
+    id: 'carts'
+    partitionKey: '/user_id'
+  } 
+  {
+    name: 'chat_sessions'
+    id: 'chat_sessions'
+    partitionKey: '/user_id'
+  }
+    {
+    name: 'products'
+    id: 'products'
+    partitionKey: '/productId'
+  }
+    {
+    name: 'transactions'
+    id: 'transactions'
+    partitionKey: '/user_id'
+  }
+    {
+    name: 'users'
+    id: 'users'
+    partitionKey: '/email'
   }
 ]
 

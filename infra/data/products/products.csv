@@ -1,4 +1,4 @@
-ProductID,ProductName,ProductCategory,Price,ProductDescription,ProductPunchLine,ImageURL
+productId,title,category,price,description,punchLine,image
 CP-0001,Snow Veil,Paint Shades,59.5,"A crisp white with a hint of warmth — perfect for open, modern interiors.","Soft white, airy, minimal, fresh",https://raw.githubusercontent.com/TravisHilbert/CCBSAP/main/JPG/SnowVeil.jpg
 CP-0002,Porcelain Mist,Paint Shades,59.5,"A gentle off-white that softens spaces with a cozy, inviting glow.","Warm neutral, beige, cozy, calm",https://raw.githubusercontent.com/TravisHilbert/CCBSAP/main/JPG/PorcelainMist.jpg
 CP-0003,Stone Dusk,Paint Shades,59.5,"A balanced mix of gray and beige, ideal for grounding a room without heaviness.","Greige, muted, balanced, modern",https://raw.githubusercontent.com/TravisHilbert/CCBSAP/main/JPG/StoneDusk.jpg

@@ -89,7 +89,7 @@ param createdBy string = contains(deployer(), 'userPrincipalName')? split(deploy
 
 var solutionPrefix = 'ccb${padLeft(take(uniqueId, 12), 12, '0')}'
 
-var acrName = 'newacrapith' 
+var acrName = 'ccbcontainerreg' //change to real ACR name 
 //'ncccbacr1'
 
 //Get the current deployer's information
@@ -199,7 +199,7 @@ module backend_docker 'deploy_backend_docker.bicep' = {
     appSettings: {
       AZURE_OPENAI_DEPLOYMENT_MODEL: gptModelName
       AZURE_OPENAI_ENDPOINT: aifoundry.outputs.aiServicesTarget
-      AZURE_OPENAI_API_VERSION: azureOpenAIApiVersion
+      AZURE_OPENAI_API_VERSION: azureOpenAIApiVersion //
       AZURE_OPENAI_RESOURCE: aifoundry.outputs.aiServicesName
       AZURE_AI_AGENT_ENDPOINT: aifoundry.outputs.projectEndpoint
       AZURE_AI_AGENT_API_VERSION: azureAiAgentApiVersion
@@ -220,23 +220,31 @@ module backend_docker 'deploy_backend_docker.bicep' = {
       APPLICATIONINSIGHTS_CONNECTION_STRING: aifoundry.outputs.applicationInsightsConnectionString
       DUMMY_TEST: 'True'
       SOLUTION_NAME: solutionPrefix
-      APP_ENV: 'Prod'
+      APP_ENV: 'Prod'//
 
-      ALLOWED_ORIGINS_STR: ''
-      AZURE_FOUNDRY_ENDPOINT: ''
-      AZURE_OPENAI_API_KEY: ''
-      AZURE_SEARCH_API_KEY: ''
+      ALLOWED_ORIGINS_STR: '*'
+      AZURE_FOUNDRY_ENDPOINT: aifoundry.outputs.projectEndpoint
+      //AZURE_OPENAI_API_KEY: ''
+      //AZURE_SEARCH_API_KEY: ''
       AZURE_SEARCH_ENDPOINT: aifoundry.outputs.aiSearchTarget
-      AZURE_SEARCH_INDEX: 'policies_index'
-      AZURE_SEARCH_PRODUCT_INDEX: 'products_index'
-      COSMOS_DB_DATABASE_NAME: cosmosDBModule.outputs.cosmosDatabaseName
-      COSMOS_DB_ENDPOINT: '${cosmosDBModule.outputs.cosmosDatabaseName}.documents.azure.com:443/'
-      COSMOS_DB_KEY: '' 
-      FOUNDRY_KNOWLEDGE_AGENT_ID: ''
-      FOUNDRY_ORCHESTRATOR_AGENT_ID: ''
-      FOUNDRY_ORDER_AGENT_ID: ''
-      FOUNDRY_PRODUCT_AGENT_ID: ''
+      AZURE_SEARCH_INDEX: 'policies'//
+      AZURE_SEARCH_PRODUCT_INDEX: 'products'//
+      COSMOS_DB_DATABASE_NAME: cosmosDBModule.outputs.cosmosDatabaseName //
+      COSMOS_DB_ENDPOINT: 'https://${cosmosDBModule.outputs.cosmosAccountName}.documents.azure.com:443/' //
+      //COSMOS_DB_KEY: '' 
+      // FOUNDRY_KNOWLEDGE_AGENT_ID: ''
+      // FOUNDRY_ORCHESTRATOR_AGENT_ID: ''
+      // FOUNDRY_ORDER_AGENT_ID: ''
+      // FOUNDRY_PRODUCT_AGENT_ID: ''
       USE_FOUNDRY_AGENTS: 'True'
+      AZURE_OPENAI_DEPLOYMENT_NAME: gptModelName //
+      RATE_LIMIT_REQUESTS: 100 //
+      RATE_LIMIT_WINDOW: 60 //
+      FOUNDRY_CHAT_AGENT_ID: ''//
+      FOUNDRY_CUSTOM_PRODUCT_AGENT_ID: ''//
+      FOUNDRY_POLICY_AGENT_ID: ''//
+
+
     }
   }
   scope: resourceGroup(resourceGroup().name)

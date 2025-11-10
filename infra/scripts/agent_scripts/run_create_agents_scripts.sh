@@ -97,7 +97,7 @@ echo "Agents creation completed."
 az webapp config appsettings set \
   --resource-group "$resourceGroup" \
   --name "$apiAppName" \
-  --settings AGENT_ID_CHAT="$chatAgentId" AGENT_ID_PRODUCT="$productAgentId" AGENT_ID_POLICY="$policyAgentId" \
+  --settings FOUNDRY_CHAT_AGENT_ID="$chatAgentId" FOUNDRY_CUSTOM_PRODUCT_AGENT_ID="$productAgentId" FOUNDRY_POLICY_AGENT_ID="$policyAgentId" \
   -o none
 
 echo "Environment variables updated for App Service: $apiAppName"
